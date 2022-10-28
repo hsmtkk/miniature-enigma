@@ -89,6 +89,13 @@ class MyStack extends TerraformStack {
         },
       },
     });
+
+    new google.SecretManagerSecret(this, 'secret_manager', {
+      secretId: 'secret',
+      replication: {
+        automatic: true, 
+      },
+    });
   }
 }
 
