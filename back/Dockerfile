@@ -6,6 +6,7 @@ RUN go mod download
 COPY back/ /go/src/app/back/
 COPY openweather/ /go/src/app/openweather/
 COPY util/ /go/src/app/util/
+COPY trace/ /go/src/app/trace/
 WORKDIR /go/src/app/back
 RUN CGO_ENABLED=0 go build -o back
 

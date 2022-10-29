@@ -5,6 +5,7 @@ COPY go.sum .
 RUN go mod download
 COPY front/ /go/src/app/front/
 COPY util/ /go/src/app/util/
+COPY trace/ /go/src/app/trace/
 WORKDIR /go/src/app/front
 RUN CGO_ENABLED=0 go build -o front
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,12 +9,23 @@ import (
 	"math/rand"
 	"net/http"
 
+	"github.com/hsmtkk/miniature-enigma/trace"
 	"github.com/hsmtkk/miniature-enigma/util"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 )
 
+const serviceName = "front"
+
 func main() {
+	ctx := context.Background()
+
+	projectID, err := util.GetProjectID(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	port, err := util.GetPort()
 	if err != nil {
 		log.Fatal(err)
@@ -29,7 +41,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	h := newHandler(backURL, collection)
+	tp, err := trace.GetTraceProvider(ctx, projectID, serviceName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tp.Shutdown(ctx)
+
+	h := newHandler(projectID, backURL, collection)
 
 	// Echo instance
 	e := echo.New()
@@ -37,6 +55,7 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(otelecho.Middleware(serviceName, otelecho.WithTracerProvider(tp)))
 
 	// Routes
 	e.GET("/", h.root)
@@ -46,12 +65,13 @@ func main() {
 }
 
 type handler struct {
+	projectID  string
 	backURL    string
 	collection string
 }
 
-func newHandler(backURL, collection string) *handler {
-	return &handler{backURL, collection}
+func newHandler(projectID, backURL, collection string) *handler {
+	return &handler{projectID, backURL, collection}
 }
 
 var cities = []string{"Tokyo", "Osaka", "Nagoya", "Fukuoka", "Kyoto", "Sapporo", "Sendai", "Naha", "Hiroshima", "HogeFuga"}
@@ -59,11 +79,6 @@ var cities = []string{"Tokyo", "Osaka", "Nagoya", "Fukuoka", "Kyoto", "Sapporo",
 // Handler
 func (h *handler) root(c echo.Context) error {
 	city := cities[rand.Intn(len(cities))]
-
-	projectID, err := util.GetProjectID(c.Request().Context())
-	if err != nil {
-		return err
-	}
 
 	result, err := h.accessBack(city)
 	if err != nil {
@@ -77,7 +92,7 @@ func (h *handler) root(c echo.Context) error {
 		return fmt.Errorf("json.Unmarshal failed; %w", err)
 	}
 
-	if err := firestoreSave(c.Request().Context(), projectID, h.collection, decoded); err != nil {
+	if err := firestoreSave(c.Request().Context(), h.projectID, h.collection, decoded); err != nil {
 		return err
 	}
 

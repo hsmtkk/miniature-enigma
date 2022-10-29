@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,12 +10,23 @@ import (
 	"time"
 
 	"github.com/hsmtkk/miniature-enigma/openweather"
+	"github.com/hsmtkk/miniature-enigma/trace"
 	"github.com/hsmtkk/miniature-enigma/util"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 )
 
+const serviceName = "back"
+
 func main() {
+	ctx := context.Background()
+
+	projectID, err := util.GetProjectID(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	port, err := util.GetPort()
 	if err != nil {
 		log.Fatal(err)
@@ -25,7 +37,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	h := newHandler(secretID)
+	tp, err := trace.GetTraceProvider(ctx, projectID, serviceName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tp.Shutdown(ctx)
+
+	h := newHandler(projectID, secretID)
 
 	// Echo instance
 	e := echo.New()
@@ -33,6 +51,7 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(otelecho.Middleware(serviceName, otelecho.WithTracerProvider(tp)))
 
 	// Routes
 	e.GET("/", h.root)
@@ -42,11 +61,12 @@ func main() {
 }
 
 type handler struct {
-	secretID string
+	projectID string
+	secretID  string
 }
 
-func newHandler(secretID string) *handler {
-	return &handler{secretID}
+func newHandler(projectID, secretID string) *handler {
+	return &handler{projectID, secretID}
 }
 
 type query struct {
@@ -68,12 +88,7 @@ func (h *handler) root(c echo.Context) error {
 		return fmt.Errorf("echo.Context.Bind failed; %w", err)
 	}
 
-	projectID, err := util.GetProjectID(c.Request().Context())
-	if err != nil {
-		return err
-	}
-
-	key, err := getOpenweatherKey(c.Request().Context(), projectID, h.secretID)
+	key, err := getOpenweatherKey(c.Request().Context(), h.projectID, h.secretID)
 	if err != nil {
 		return err
 	}
