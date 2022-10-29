@@ -112,6 +112,7 @@ class MyStack extends TerraformStack {
       httpTarget: {
         uri: front_run.status.get(0).url,
       },
+      region: location,
       schedule: '* * * * *',
     });
   }
