@@ -6,6 +6,7 @@ import * as google from '@cdktf/provider-google';
 
 const location = 'asia-northeast1';
 const project = 'miniature-enigma';
+const openweather_key_secret_id = 'openweather-key';
 
 class MyStack extends TerraformStack {
   constructor(scope: Construct, id: string) {
@@ -43,6 +44,10 @@ class MyStack extends TerraformStack {
       template: {
         spec: {
           containers: [{
+            env: [{
+              name: 'OPENWEATHER_KEY_SECRET_ID',
+              value: openweather_key_secret_id,
+            }],
             image: 'asia-northeast1-docker.pkg.dev/miniature-enigma/docker/back',
           }],
           serviceAccountName: run_service_account.email,
@@ -91,7 +96,7 @@ class MyStack extends TerraformStack {
     });
 
     new google.SecretManagerSecret(this, 'secret_manager', {
-      secretId: 'secret',
+      secretId: openweather_key_secret_id,
       replication: {
         automatic: true, 
       },
