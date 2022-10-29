@@ -36,11 +36,6 @@ class MyStack extends TerraformStack {
     const back_run = new google.CloudRunService(this, 'back_run', {
       autogenerateRevisionName: true,
       location,
-      metadata: {
-        annotations: {
-          'run.googleapis.com/ingress': 'internal',
-        },
-      },
       name: 'back',
       template: {
         spec: {
