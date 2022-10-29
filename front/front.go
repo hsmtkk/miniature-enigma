@@ -79,7 +79,7 @@ func (h *handler) root(c echo.Context) error {
 		return err
 	}
 
-	return c.String(http.StatusOK, "Hello, World!")
+	return c.String(http.StatusOK, city)
 }
 
 func (h *handler) accessBack(city string) ([]byte, error) {
