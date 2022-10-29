@@ -78,5 +78,7 @@ func (h *handler) root(c echo.Context) error {
 		return fmt.Errorf("json.Unmarshal failed; %w", err)
 	}
 
+	fmt.Printf("response: %v\n", decoded)
+
 	return c.JSON(http.StatusOK, decoded)
 }

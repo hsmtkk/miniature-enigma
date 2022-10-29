@@ -70,6 +70,8 @@ func (h *handler) root(c echo.Context) error {
 		return err
 	}
 
+	fmt.Printf("response from back: %s\n", string(result))
+
 	var decoded map[string]interface{}
 	if err := json.Unmarshal(result, &decoded); err != nil {
 		return fmt.Errorf("json.Unmarshal failed; %w", err)
