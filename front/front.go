@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/hsmtkk/miniature-enigma/trace"
 	"github.com/hsmtkk/miniature-enigma/util"
@@ -78,6 +79,9 @@ var cities = []string{"Tokyo", "Osaka", "Nagoya", "Fukuoka", "Kyoto", "Sapporo",
 
 // Handler
 func (h *handler) root(c echo.Context) error {
+	// random sleep
+	time.Sleep(time.Second * time.Duration(rand.Intn(10)))
+
 	city := cities[rand.Intn(len(cities))]
 
 	result, err := h.accessBack(city)
