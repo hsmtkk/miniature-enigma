@@ -130,6 +130,12 @@ class MyStack extends TerraformStack {
       project,
       role: 'roles/datastore.user',
     });
+
+    new google.ProjectIamBinding(this, 'allow_sa_cloudtrace_put', {
+      members: [`serviceAccount:${run_service_account.email}`],
+      project,
+      role: 'roles/cloudtrace.agent',
+    });
   }
 }
 
