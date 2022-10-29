@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"net/http/httputil"
 	"time"
 
 	"github.com/hsmtkk/miniature-enigma/openweather"
@@ -75,6 +76,12 @@ type query struct {
 
 // Handler
 func (h *handler) root(c echo.Context) error {
+	reqBytes, err := httputil.DumpRequest(c.Request(), false)
+	if err != nil {
+		return fmt.Errorf("httputil.DumpRequest failed; %w", err)
+	}
+	fmt.Printf("request: %s\n", string(reqBytes))
+
 	// random delay
 	time.Sleep(time.Second * time.Duration(rand.Intn(10)))
 

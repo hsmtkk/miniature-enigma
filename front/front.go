@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"net/http/httputil"
 	"time"
 
 	"github.com/hsmtkk/miniature-enigma/trace"
@@ -79,6 +80,12 @@ var cities = []string{"Tokyo", "Osaka", "Nagoya", "Fukuoka", "Kyoto", "Sapporo",
 
 // Handler
 func (h *handler) root(c echo.Context) error {
+	reqBytes, err := httputil.DumpRequest(c.Request(), false)
+	if err != nil {
+		return fmt.Errorf("httputil.DumpRequest failed; %w", err)
+	}
+	fmt.Printf("request dump: %s\n", string(reqBytes))
+
 	// random sleep
 	time.Sleep(time.Second * time.Duration(rand.Intn(10)))
 
