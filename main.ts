@@ -110,6 +110,7 @@ class MyStack extends TerraformStack {
     new google.CloudSchedulerJob(this, 'front_schedule', {
       name: 'front_schedule',
       httpTarget: {
+        httpMethod: 'GET',
         uri: front_run.status.get(0).url,
       },
       region: location,
