@@ -62,6 +62,9 @@ class MyStack extends TerraformStack {
         spec: {
           containers: [{
             env: [{
+              name: 'COLLECTION',
+              value: 'openweather',
+            },{
               name: 'BACK_URL',
               value: back_run.status.get(0).url,
             }],

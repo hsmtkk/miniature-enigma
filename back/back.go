@@ -18,17 +18,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	projectID, err := util.GetProjectID()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	secretID, err := util.RequiredEnv("OPENWEATHER_KEY_SECRET_ID")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	h := newHandler(projectID, secretID)
+	h := newHandler(secretID)
 
 	// Echo instance
 	e := echo.New()
@@ -45,12 +40,11 @@ func main() {
 }
 
 type handler struct {
-	projectID string
-	secretID  string
+	secretID string
 }
 
-func newHandler(projectID, secretID string) *handler {
-	return &handler{projectID, secretID}
+func newHandler(secretID string) *handler {
+	return &handler{secretID}
 }
 
 type query struct {
@@ -64,7 +58,12 @@ func (h *handler) root(c echo.Context) error {
 		return fmt.Errorf("echo.Context.Bind failed; %w", err)
 	}
 
-	key, err := getOpenweatherKey(c.Request().Context(), h.projectID, h.secretID)
+	projectID, err := util.GetProjectID(c.Request().Context())
+	if err != nil {
+		return err
+	}
+
+	key, err := getOpenweatherKey(c.Request().Context(), projectID, h.secretID)
 	if err != nil {
 		return err
 	}
