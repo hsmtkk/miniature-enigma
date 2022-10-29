@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 
 	"github.com/hsmtkk/miniature-enigma/util"
@@ -53,23 +54,18 @@ func newHandler(backURL, collection string) *handler {
 	return &handler{backURL, collection}
 }
 
-type query struct {
-	City string `query:"city"`
-}
+var cities = []string{"Tokyo", "Osaka", "Nagoya", "Fukuoka", "Kyoto", "Sapporo", "Sendai", "Naha", "Hiroshima", "Hoge"}
 
 // Handler
 func (h *handler) root(c echo.Context) error {
-	var q query
-	if err := c.Bind(&q); err != nil {
-		return fmt.Errorf("echo.Context.Bind failed; %w", err)
-	}
+	city := cities[rand.Intn(len(cities))]
 
 	projectID, err := util.GetProjectID(c.Request().Context())
 	if err != nil {
 		return err
 	}
 
-	result, err := h.accessBack(q.City)
+	result, err := h.accessBack(city)
 	if err != nil {
 		return err
 	}
