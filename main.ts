@@ -34,6 +34,7 @@ class MyStack extends TerraformStack {
     });
 
     const back_run = new google.CloudRunService(this, 'back_run', {
+      autogenerateRevisionName: true,
       location,
       metadata: {
         annotations: {
@@ -56,6 +57,7 @@ class MyStack extends TerraformStack {
     });
 
     const front_run = new google.CloudRunService(this, 'front_run', {
+      autogenerateRevisionName: true,
       location,
       name: 'front',
       template: {
@@ -103,6 +105,14 @@ class MyStack extends TerraformStack {
       replication: {
         automatic: true, 
       },
+    });
+
+    new google.CloudSchedulerJob(this, 'front_schedule', {
+      name: 'front_schedule',
+      httpTarget: {
+        uri: front_run.status.get(0).url,
+      },
+      schedule: '* * * * *',
     });
   }
 }
