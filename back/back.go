@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/hsmtkk/miniature-enigma/openweather"
 	"github.com/hsmtkk/miniature-enigma/util"
@@ -53,6 +55,14 @@ type query struct {
 
 // Handler
 func (h *handler) root(c echo.Context) error {
+	// random delay
+	time.Sleep(time.Second * time.Duration(rand.Intn(10)))
+
+	// random error
+	if rand.Intn(10) < 3 {
+		return fmt.Errorf("something went wrong")
+	}
+
 	var q query
 	if err := c.Bind(&q); err != nil {
 		return fmt.Errorf("echo.Context.Bind failed; %w", err)

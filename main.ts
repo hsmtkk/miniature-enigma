@@ -124,6 +124,12 @@ class MyStack extends TerraformStack {
       secretId: openweather_key_secret.secretId,
       policyData: allow_sa_secret_manager_access.policyData,
     });
+
+    new google.ProjectIamBinding(this, 'allow_sa_firestore_use', {
+      members: [`serviceAccount:${run_service_account.email}`],
+      project,
+      role: 'roles/datastore.user',
+    });
   }
 }
 

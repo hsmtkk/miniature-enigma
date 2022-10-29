@@ -54,7 +54,7 @@ func newHandler(backURL, collection string) *handler {
 	return &handler{backURL, collection}
 }
 
-var cities = []string{"Tokyo", "Osaka", "Nagoya", "Fukuoka", "Kyoto", "Sapporo", "Sendai", "Naha", "Hiroshima", "Hoge"}
+var cities = []string{"Tokyo", "Osaka", "Nagoya", "Fukuoka", "Kyoto", "Sapporo", "Sendai", "Naha", "Hiroshima", "HogeFuga"}
 
 // Handler
 func (h *handler) root(c echo.Context) error {
