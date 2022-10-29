@@ -3,6 +3,7 @@ steps:
     args:
       - --cache=true
       - --cache-ttl=24h
+      - --destination=asia-northeast1-docker.pkg.dev/miniature-enigma/docker/back:latest
       - --destination=asia-northeast1-docker.pkg.dev/miniature-enigma/docker/back:$COMMIT_SHA
       - --dockerfile=back/Dockerfile
 
@@ -10,6 +11,7 @@ steps:
     args:
       - --cache=true
       - --cache-ttl=24h
+      - --destination=asia-northeast1-docker.pkg.dev/miniature-enigma/docker/front:latest
       - --destination=asia-northeast1-docker.pkg.dev/miniature-enigma/docker/front:$COMMIT_SHA
       - --dockerfile=front/Dockerfile
 

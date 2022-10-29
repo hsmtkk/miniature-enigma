@@ -95,7 +95,7 @@ class MyStack extends TerraformStack {
       },
     });
 
-    new google.SecretManagerSecret(this, 'secret_manager', {
+    const openweather_key_secret = new google.SecretManagerSecret(this, 'secret_manager', {
       secretId: openweather_key_secret_id,
       replication: {
         automatic: true, 
@@ -110,6 +110,19 @@ class MyStack extends TerraformStack {
       },
       region: location,
       schedule: '* * * * *',
+    });
+
+    const allow_sa_secret_manager_access = new google.DataGoogleIamPolicy(this, 'allow_sa_secret_manager_access', {
+      binding: [{
+        members: [`serviceAccount:${run_service_account.email}`],
+        role: 'roles/secretmanager.secretAccessor',
+      }],
+    });
+
+    new google.SecretManagerSecretIamPolicy(this, 'secret_manager_policy', {
+      project,
+      secretId: openweather_key_secret.secretId,
+      policyData: allow_sa_secret_manager_access.policyData,
     });
   }
 }
