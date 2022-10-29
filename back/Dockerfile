@@ -3,8 +3,9 @@ WORKDIR /go/src/app
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-COPY util/ /go/src/app/util/
 COPY back/ /go/src/app/back/
+COPY openweather/ /go/src/app/openweather/
+COPY util/ /go/src/app/util/
 WORKDIR /go/src/app/back
 RUN CGO_ENABLED=0 go build -o back
 
